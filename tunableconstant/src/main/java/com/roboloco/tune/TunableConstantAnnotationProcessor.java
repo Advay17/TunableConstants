@@ -85,6 +85,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
             }
             TypeSpec type = TypeSpec.classBuilder(tunableConstantsClassName).addModifiers(Modifier.PUBLIC).addSuperinterface(TUNABLE_CONSTANT_TYPE).superclass(classElement.asType()).addMethod(constructorBuilder.build()).addMethod(reloadBuilder.build()).build();
             JavaFile file = JavaFile.builder(tuanbleConstantsPackage, type).build();
+            System.out.println(file);
             try {
                 file.writeTo(processingEnv.getFiler());
               } catch (IOException e) {
