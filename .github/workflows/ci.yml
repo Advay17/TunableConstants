@@ -92,6 +92,8 @@ jobs:
         # if: |
         #   !startsWith(github.ref, 'refs/tags/v')
         run: ./gradlew publish -Pthirdparty
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: combiner
       # - name: Combine (Release)
       #   if: |
