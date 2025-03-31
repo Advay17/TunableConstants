@@ -49,8 +49,8 @@ ext.addTaskToCopyAllOutputs = { task ->
 
 def artifactGroupId = 'com.roboloco.tune'
 def baseArtifactId = 'tune'
-def driverZipBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-driver_CLS"
-def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-java_CLS"
+def driverZipBaseName = "_GROUP_com_roboloco_tune_ID_${baseArtifactId}-driver_CLS"
+def javaBaseName = "_GROUP_com_roboloco_tune_ID_${baseArtifactId}-java_CLS"
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
