@@ -5,7 +5,7 @@ apply plugin: 'maven-publish'
 
 ext.licenseFile = files("$rootDir/LICENSE.txt")
 
-def templateVendorFile = "ExampleVendorJson.json"
+def templateVendorFile = "TunableConstantsGenerator.json"
 
 def pubVersion = '0.0.1'
 
@@ -47,8 +47,8 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archiveFile
 }
 
-def artifactGroupId = 'com.vendor.frc'
-def baseArtifactId = 'Vendor'
+def artifactGroupId = 'com.roboloco.tune'
+def baseArtifactId = 'tune'
 def driverZipBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-driver_CLS"
 def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-java_CLS"
 

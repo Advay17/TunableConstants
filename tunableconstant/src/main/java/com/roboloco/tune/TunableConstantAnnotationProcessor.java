@@ -32,14 +32,15 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
       }
     private static final TypeName TUNABLE_CONSTANT_TYPE = ClassName.get("com.roboloco.tune",
     "TunableConstant");
-    private static final HashSet<String> TUNABLE_TYPES = new HashMap<>(){{
-        put("boolean");
-        put("double");
-        put("float");
-        put("int");
-        put("long");
-        put("java.lang.String");
-    }};
+    private static final HashSet<String> TUNABLE_TYPES = new HashSet<String>();
+    static {
+        TUNABLE_TYPES.add("boolean");
+        TUNABLE_TYPES.add("double");
+        TUNABLE_TYPES.add("float");
+        TUNABLE_TYPES.add("int");
+        TUNABLE_TYPES.add("long");
+        TUNABLE_TYPES.add("java.lang.String");
+    }
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         Optional<? extends TypeElement> annotationOptional = annotations.stream()
@@ -59,18 +60,18 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
             boolean isSuperClass = false;
             while(typeElement!=null){
                 final TypeElement finalTypeElement = typeElement;
-                final boolean finalIsSuperclass = isSuperclass;
+                final boolean finalIsSuperclass = isSuperClass;
                 typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD)).forEach(fieldElement -> {
                     if(finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE)) return;
 
                     String simpleName = fieldElement.getSimpleName().toString();
                     String fieldType=fieldElement.asType().toString();
                     
-                    if(!LOGGABLE_TYPES.contains(fieldType)){
+                    if(!TUNABLE_TYPES.contains(fieldType)){
                         throw new RuntimeException("[IsTunableConstant] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
-                    Object defaultFieldValue = getFieldValue(classElement, util);
+                    Object defaultFieldValue = getFieldValue(classElement, classElement);
                     constructorBuilder.addCode("Preferences.init" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ");\n");
                     reloadBuilder.addCode(simpleName + " = Preferences.get" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ");\n");
 
@@ -104,13 +105,13 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
       return Set.of("com.roboloco.tune.IsTunableConstant");
     }
 
-    public static Object getFieldValue(Element element, Elements elementUtils) {
+    public static Object getFieldValue(Element element, Element classElement) {
         if (!(element instanceof VariableElement)) {
             throw new IllegalArgumentException("Element is not a field.");
         }
         
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String className = elementUtils.getBinaryName(enclosingElement).toString();
+        String className = classElement.getSimpleName().toString();
         String fieldName = element.getSimpleName().toString();
 
         try {
