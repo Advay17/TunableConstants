@@ -7,7 +7,7 @@
     "mavenUrls": [
         "https://maven.pkg.github.com/Advay17/TunableConstants"
     ],
-    "jsonUrl": "https://github.com/Advay17/TunableConstants/releases/download/v0.0.1-alpha/TunableConstantsGenerator.json",
+    "jsonUrl": "https://github.com/Advay17/TunableConstants/releases/download/v0.0.2-alpha/TunableConstantsGenerator.json",
     "javaDependencies": [
         {
             "groupId": "${groupId}",
