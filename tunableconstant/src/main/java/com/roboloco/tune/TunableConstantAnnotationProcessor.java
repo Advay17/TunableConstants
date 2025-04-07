@@ -73,8 +73,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
                     Object defaultFieldValue = getFieldValue(fieldElement, classElement);
-                    constructorBuilder.addStatement("Preferences.init" + preferencesName + "(\"" + simpleName +"\"," + defaultFieldValue + ")", PREFERENCES_CLASS);
-                    reloadBuilder.addStatement(simpleName + " = Preferences.get" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ")", PREFERENCES_CLASS);
+                    constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + simpleName +"\"," + defaultFieldValue + ")", PREFERENCES_CLASS);
+                    reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ")", PREFERENCES_CLASS);
 
                 });
                 TypeMirror mirror = (typeElement).getSuperclass();
@@ -118,7 +118,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
             Class<?> clazz = classElement.getClass();
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
-
+            System.out.println(field);
+            System.out.println(field.get(null));
             return field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
