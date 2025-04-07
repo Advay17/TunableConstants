@@ -117,7 +117,9 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
         try {
             Class<?> clazz = classElement.getClass();
             System.out.println(clazz);
-            System.out.println(clazz.getDeclaredFields());
+            for(Field f: clazz.getDeclaredFields()){
+                System.out.println(f.getName());
+            }
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
             System.out.println(field);
