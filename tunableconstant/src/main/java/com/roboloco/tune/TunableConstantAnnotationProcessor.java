@@ -1,9 +1,6 @@
 package com.roboloco.tune;
 
 import com.squareup.javapoet.*;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.Store;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -75,9 +72,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                         throw new RuntimeException("[IsTunableConstant] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
-                    Object defaultFieldValue = getFieldValue(fieldElement, classElement);
-                    constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + simpleName +"\"," + defaultFieldValue + ")", PREFERENCES_CLASS);
-                    reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(\"" + simpleName +"\"," + defaultFieldValue + ")", PREFERENCES_CLASS);
+                    constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
+                    reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(\"" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
 
                 });
                 TypeMirror mirror = (typeElement).getSuperclass();
@@ -107,27 +103,5 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
     @Override
     public Set<String> getSupportedAnnotationTypes() {
       return Set.of("com.roboloco.tune.IsTunableConstant");
-    }
-
-    public static Object getFieldValue(Element element, Element classElement) {
-        if (!(element instanceof VariableElement)) {
-            throw new IllegalArgumentException("Element is not a field.");
-        }
-        
-        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String fieldName = element.getSimpleName().toString();
-
-        try {
-            Reflections reflections = new Reflections("frc.robot");
-            Set<Class<? extends Object>> allClasses = 
-                reflections.getSubTypesOf(Object.class);
-                System.out.println("All classes: " + allClasses);
-            Class<?> clazz = Class.forName(getPackageName(classElement) + "." + classElement.getSimpleName());
-            Field field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
-            return null;
-        }
     }
 }
