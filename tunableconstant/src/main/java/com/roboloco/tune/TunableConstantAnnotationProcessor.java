@@ -125,7 +125,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
             // System.out.println(field);
             // System.out.println(field.get(null));
             return field.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
             return null;
         }
     }
