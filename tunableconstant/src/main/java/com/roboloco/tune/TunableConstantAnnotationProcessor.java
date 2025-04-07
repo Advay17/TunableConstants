@@ -1,6 +1,9 @@
 package com.roboloco.tune;
 
 import com.squareup.javapoet.*;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.Store;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -115,12 +118,15 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
         String fieldName = element.getSimpleName().toString();
 
         try {
+            Reflections reflections = new Reflections("frc.robot");
+            Set<Class<? extends Object>> allClasses = 
+                reflections.getSubTypesOf(Object.class);
+                System.out.println("All classes: " + allClasses);
             Class<?> clazz = Class.forName(getPackageName(classElement) + "." + classElement.getSimpleName());
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
             return null;
         }
     }
