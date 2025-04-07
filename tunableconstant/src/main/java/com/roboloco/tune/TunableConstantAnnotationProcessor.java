@@ -32,6 +32,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
       }
     private static final TypeName TUNABLE_CONSTANT_TYPE = ClassName.get("com.roboloco.tune",
     "TunableConstant");
+    private static final ClassName PREFERENCES_CLASS = ClassName.get("edu.wpi.first.wpilibj", "Preferences");
     private static final HashSet<String> TUNABLE_TYPES = new HashSet<String>();
     static {
         TUNABLE_TYPES.add("boolean");
@@ -72,8 +73,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
                     Object defaultFieldValue = getFieldValue(fieldElement, classElement);
-                    constructorBuilder.addCode("Preferences.init" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ");\n");
-                    reloadBuilder.addCode(simpleName + " = Preferences.get" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ");\n");
+                    constructorBuilder.addStatement("Preferences.init" + preferencesName + "(\"" + simpleName +"\"," + defaultFieldValue + ")", PREFERENCES_CLASS);
+                    reloadBuilder.addStatement(simpleName + " = Preferences.get" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ")", PREFERENCES_CLASS);
 
                 });
                 TypeMirror mirror = (typeElement).getSuperclass();
@@ -85,7 +86,6 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
             }
             TypeSpec type = TypeSpec.classBuilder(tunableConstantsClassName).addModifiers(Modifier.PUBLIC).addSuperinterface(TUNABLE_CONSTANT_TYPE).superclass(classElement.asType()).addMethod(constructorBuilder.build()).addMethod(reloadBuilder.build()).build();
             JavaFile file = JavaFile.builder(tuanbleConstantsPackage, type).build();
-            System.out.println(file);
             try {
                 file.writeTo(processingEnv.getFiler());
               } catch (IOException e) {
@@ -112,16 +112,15 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
         }
         
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String className = classElement.getSimpleName().toString();
         String fieldName = element.getSimpleName().toString();
 
         try {
-            Class<?> clazz = Class.forName(className);
+            Class<?> clazz = classElement.getClass();
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
 
             return field.get(null);
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }
