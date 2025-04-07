@@ -71,7 +71,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                         throw new RuntimeException("[IsTunableConstant] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
-                    Object defaultFieldValue = getFieldValue(classElement, classElement);
+                    Object defaultFieldValue = getFieldValue(fieldElement, classElement);
                     constructorBuilder.addCode("Preferences.init" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ");\n");
                     reloadBuilder.addCode(simpleName + " = Preferences.get" + preferencesName + "(" + simpleName +"," + defaultFieldValue + ");\n");
 
