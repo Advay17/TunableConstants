@@ -72,8 +72,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                         throw new RuntimeException("[IsTunableConstant] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
-                    constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
-                    reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(\"" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
+                    constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
+                    reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
 
                 });
                 TypeMirror mirror = (typeElement).getSuperclass();
