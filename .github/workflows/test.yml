@@ -18,3 +18,5 @@ jobs:
           arguments: publish -Pthirdparty
         env:
           GITHUB_TOKEN: ${{ secrets.JAVA_TOKEN }}
+          REPSY_USERNAME: ${{ secrets.USERNAME }}
+          REPSY_PASSWORD: ${{ secrets.PASSWORD }}
