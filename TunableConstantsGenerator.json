@@ -5,9 +5,9 @@
     "frcYear": "2025",
     "uuid": "fec00324-4af2-420c-aa85-d87910e5e322",
     "mavenUrls": [
-        "https://maven.pkg.github.com/Advay17/TunableConstants"
+        "https://repo.repsy.io/mvn/advay/tunableconstants/s"
     ],
-    "jsonUrl": "https://github.com/Advay17/TunableConstants/releases/download/v0.0.2-alpha/TunableConstantsGenerator.json",
+    "jsonUrl": "https://github.com/Advay17/TunableConstants/releases/download/v${version}-alpha/TunableConstantsGenerator.json",
     "javaDependencies": [
         {
             "groupId": "${groupId}",
@@ -15,22 +15,6 @@
             "version": "${version}"
         }
     ],
-    "jniDependencies": [
-        {
-            "groupId": "${groupId}",
-            "artifactId": "${artifactId}-driver",
-            "version": "${version}",
-            "skipInvalidPlatforms": true,
-            "isJar": false,
-            "validPlatforms": [
-                "windowsx86-64",
-                "linuxarm64",
-                "linuxx86-64",
-                "linuxathena",
-                "linuxarm32",
-                "osxuniversal"
-            ]
-        }
-    ],
+    "jniDependencies": [],
     "cppDependencies": []
 }
