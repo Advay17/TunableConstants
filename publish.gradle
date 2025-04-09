@@ -178,7 +178,7 @@ model {
             }
 
             tuneAnnotation(MavenPublication) {
-                from project(":tunableconstant").components.java
+                from project(":tunable-constants-processing").components.java
                 artifactId = "tune-annotation-processor"
                 groupId artifactGroupId
                 version pubVersion

@@ -8,13 +8,13 @@ import edu.wpi.first.networktables.NetworkTableListenerPoller;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public abstract class TunableSubsystem extends SubsystemBase{
-    public final TunableConstant[] linkedTunableConstants;
+    public final TunableConstants[] linkedTunableConstants;
     private final NetworkTableListenerPoller poller;
     private final MultiSubscriber multiSubscriber;
-    public TunableSubsystem(TunableConstant... linkedTunableConstants) {
+    public TunableSubsystem(TunableConstants... linkedTunableConstants) {
         this(NetworkTableInstance.getDefault(), linkedTunableConstants);
     }
-    public TunableSubsystem(NetworkTableInstance nTableInstance, TunableConstant... linkedTunableConstants) {
+    public TunableSubsystem(NetworkTableInstance nTableInstance, TunableConstants... linkedTunableConstants) {
         this.linkedTunableConstants = linkedTunableConstants;
         this.poller = new NetworkTableListenerPoller(nTableInstance);
         String[] tableNames = new String[linkedTunableConstants.length];
@@ -28,7 +28,7 @@ public abstract class TunableSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         if(poller.readQueue().length>0){
-            for(TunableConstant c: linkedTunableConstants){
+            for(TunableConstants c: linkedTunableConstants){
                 c.reload();
             }
             reload();

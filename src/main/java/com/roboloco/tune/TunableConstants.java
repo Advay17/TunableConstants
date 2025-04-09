@@ -1,5 +1,5 @@
 package com.roboloco.tune;
 
-public interface TunableConstant {
+public interface TunableConstants {
     public void reload();
 }

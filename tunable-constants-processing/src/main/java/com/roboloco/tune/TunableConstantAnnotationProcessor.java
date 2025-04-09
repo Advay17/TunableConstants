@@ -31,7 +31,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
         return null;
       }
     private static final TypeName TUNABLE_CONSTANT_TYPE = ClassName.get("com.roboloco.tune",
-    "TunableConstant");
+    "TunableConstants");
     private static final ClassName PREFERENCES_CLASS = ClassName.get("edu.wpi.first.wpilibj", "Preferences");
     private static final HashSet<String> TUNABLE_TYPES = new HashSet<String>();
     static {
@@ -45,7 +45,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
         Optional<? extends TypeElement> annotationOptional = annotations.stream()
-        .filter((te) -> te.getSimpleName().toString().equals("IsTunableConstant")).findFirst();
+        .filter((te) -> te.getSimpleName().toString().equals("IsTunableConstants")).findFirst();
         if (!annotationOptional.isPresent()) {
             return false;
         }
@@ -69,7 +69,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                     String fieldType=fieldElement.asType().toString();
                     
                     if(!TUNABLE_TYPES.contains(fieldType)){
-                        throw new RuntimeException("[IsTunableConstant] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
+                        throw new RuntimeException("[IsTunableConstants] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
                     constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
@@ -102,6 +102,6 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
   
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-      return Set.of("com.roboloco.tune.IsTunableConstant");
+      return Set.of("com.roboloco.tune.IsTunableConstants");
     }
 }
