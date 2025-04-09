@@ -63,7 +63,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                 final TypeElement finalTypeElement = typeElement;
                 final boolean finalIsSuperclass = isSuperClass;
                 typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD)).forEach(fieldElement -> {
-                    if(finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE)) return;
+                    if(finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE) || fieldElement.getModifiers().contains(Modifier.FINAL)) return;
 
                     String simpleName = fieldElement.getSimpleName().toString();
                     String fieldType=fieldElement.asType().toString();
