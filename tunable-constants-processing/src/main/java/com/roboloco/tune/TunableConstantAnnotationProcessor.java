@@ -8,14 +8,11 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -56,7 +53,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
 
             MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
             MethodSpec.Builder reloadBuilder = MethodSpec.methodBuilder("reload").addAnnotation(Override.class).addModifiers(Modifier.PUBLIC);
-            Types util = processingEnv.getTypeUtils();
+            Types typeUtil = processingEnv.getTypeUtils();
+            Elements elementUtil = processingEnv.getElementUtils();
             TypeElement typeElement = (TypeElement) classElement;
             boolean isSuperClass = false;
             while(typeElement!=null){
@@ -67,17 +65,22 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                     String simpleName = fieldElement.getSimpleName().toString();
                     String fieldType=fieldElement.asType().toString();
                     
-                    if(!TUNABLE_TYPES.contains(fieldType)){
+                    if(TUNABLE_TYPES.contains(fieldType)){
+                      String preferencesName = fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
+                      constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
+                      reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
+                    }
+                    else if (classExists("Tunable" + fieldType) && typeUtil.isAssignable(elementUtil.getTypeElement("Tunable" + fieldType).asType(), elementUtil.getTypeElement("com.roboloco.tune.Tunable").asType())){
+                      constructorBuilder.addStatement("$S=new Tunable", simpleName);
+                    }
+                    else{
                         return;
                     }
-                    String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
-                    constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
-                    reloadBuilder.addStatement(simpleName + " = $T.get" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
 
                 });
                 TypeMirror mirror = (typeElement).getSuperclass();
                 if(mirror.getKind() == TypeKind.DECLARED){
-                    typeElement = (TypeElement) util.asElement(mirror);
+                    typeElement = (TypeElement) typeUtil.asElement(mirror);
                     isSuperClass=true;
                 }
                 else typeElement=null;
@@ -102,5 +105,14 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
     @Override
     public Set<String> getSupportedAnnotationTypes() {
       return Set.of("com.roboloco.tune.IsTunableConstants");
+    }
+
+    public static boolean classExists(String classPath){
+        try {
+            Class.forName(classPath);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }
