@@ -60,7 +60,6 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
             TypeElement typeElement = (TypeElement) classElement;
             boolean isSuperClass = false;
             while(typeElement!=null){
-                final TypeElement finalTypeElement = typeElement;
                 final boolean finalIsSuperclass = isSuperClass;
                 typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD)).forEach(fieldElement -> {
                     if(finalIsSuperclass && fieldElement.getModifiers().contains(Modifier.PRIVATE) || fieldElement.getModifiers().contains(Modifier.FINAL)) return;
@@ -69,7 +68,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor{
                     String fieldType=fieldElement.asType().toString();
                     
                     if(!TUNABLE_TYPES.contains(fieldType)){
-                        throw new RuntimeException("[IsTunableConstants] Type \"" + simpleName + "\" from \"" + finalTypeElement.getSimpleName() +"\" is not loggable.");
+                        return;
                     }
                     String preferencesName = (fieldType.contains("String"))? "String": fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
                     constructorBuilder.addStatement("$T.init" + preferencesName + "(\"" + classElement.getSimpleName() + "/" + simpleName +"\"," + simpleName + ")", PREFERENCES_CLASS);
