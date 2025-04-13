@@ -7,14 +7,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableListenerPoller;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public abstract class TunableSubsystem extends SubsystemBase{
+public abstract class AutoReloadableSubsystem extends SubsystemBase{
     public final TunableConstants[] linkedTunableConstants;
     private final NetworkTableListenerPoller poller;
     private final MultiSubscriber multiSubscriber;
-    public TunableSubsystem(TunableConstants... linkedTunableConstants) {
+    public AutoReloadableSubsystem(TunableConstants... linkedTunableConstants) {
         this(NetworkTableInstance.getDefault(), linkedTunableConstants);
     }
-    public TunableSubsystem(NetworkTableInstance nTableInstance, TunableConstants... linkedTunableConstants) {
+    public AutoReloadableSubsystem(NetworkTableInstance nTableInstance, TunableConstants... linkedTunableConstants) {
         this.linkedTunableConstants = linkedTunableConstants;
         this.poller = new NetworkTableListenerPoller(nTableInstance);
         String[] tableNames = new String[linkedTunableConstants.length];

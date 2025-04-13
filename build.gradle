@@ -8,6 +8,7 @@ plugins {
   id 'edu.wpi.first.NativeUtils' version '2025.9.0'
   id 'edu.wpi.first.GradleJni' version '1.1.0'
   id 'edu.wpi.first.GradleVsCode' version '2.1.0'
+  id 'com.diffplug.spotless' version '6.12.0'
 }
 
 // WPILib Version
@@ -82,4 +83,44 @@ apply from: 'publish.gradle'
 
 wrapper {
   gradleVersion '8.11'
+}
+
+project.compileJava.dependsOn(spotlessApply)
+spotless {
+    java {
+        target fileTree(".") {
+            include "**/*.java"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree(".") {
+            include "**/*.gradle"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    json {
+        target fileTree(".") {
+            include "**/*.json"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        gson().indentWithSpaces(2)
+    }
+    format "misc", {
+        target fileTree(".") {
+            include "**/*.md", "**/.gitignore"
+            exclude "**/build/**", "**/build-*/**"
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
 }
