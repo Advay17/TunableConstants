@@ -1,20 +1,20 @@
 {
-    "fileName": "TunableConstantsGenerator.json",
-    "name": "Tunable Constants Generator",
-    "version": "${version}",
-    "frcYear": "2025",
-    "uuid": "fec00324-4af2-420c-aa85-d87910e5e322",
-    "mavenUrls": [
-        "https://repo.repsy.io/mvn/advay/tunableconstants/"
-    ],
-    "jsonUrl": "https://github.com/Advay17/TunableConstants/releases/download/v${version}-alpha/TunableConstantsGenerator.json",
-    "javaDependencies": [
-        {
-            "groupId": "${groupId}",
-            "artifactId": "${artifactId}-java",
-            "version": "${version}"
-        }
-    ],
-    "jniDependencies": [],
-    "cppDependencies": []
+  "fileName": "TunableConstantsGenerator.json",
+  "name": "Tunable Constants Generator",
+  "version": "${version}",
+  "frcYear": "2025",
+  "uuid": "fec00324-4af2-420c-aa85-d87910e5e322",
+  "mavenUrls": [
+    "https://repo.repsy.io/mvn/advay/tunableconstants/"
+  ],
+  "jsonUrl": "https://github.com/Advay17/TunableConstants/releases/download/v${version}-alpha/TunableConstantsGenerator.json",
+  "javaDependencies": [
+    {
+      "groupId": "${groupId}",
+      "artifactId": "${artifactId}-java",
+      "version": "${version}"
+    }
+  ],
+  "jniDependencies": [],
+  "cppDependencies": []
 }

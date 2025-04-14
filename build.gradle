@@ -1,31 +1,31 @@
 import edu.wpi.first.toolchain.*
 
 plugins {
-  id 'cpp'
-  id 'java'
-  id 'google-test'
-  id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
-  id 'edu.wpi.first.NativeUtils' version '2025.9.0'
-  id 'edu.wpi.first.GradleJni' version '1.1.0'
-  id 'edu.wpi.first.GradleVsCode' version '2.1.0'
-  id 'com.diffplug.spotless' version '6.12.0'
+    id 'cpp'
+    id 'java'
+    id 'google-test'
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
+    id 'edu.wpi.first.NativeUtils' version '2025.9.0'
+    id 'edu.wpi.first.GradleJni' version '1.1.0'
+    id 'edu.wpi.first.GradleVsCode' version '2.1.0'
+    id 'com.diffplug.spotless' version '6.12.0'
 }
 
 // WPILib Version
 ext.wpilibVersion = "2025.+"
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 if (project.hasProperty('releaseMode')) {
-  wpilibRepositories.addAllReleaseRepositories(project)
+    wpilibRepositories.addAllReleaseRepositories(project)
 } else {
-  wpilibRepositories.addAllDevelopmentRepositories(project)
+    wpilibRepositories.addAllDevelopmentRepositories(project)
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 var javaVersion = "17"
 
@@ -82,7 +82,7 @@ javadoc {
 apply from: 'publish.gradle'
 
 wrapper {
-  gradleVersion '8.11'
+    gradleVersion '8.11'
 }
 
 project.compileJava.dependsOn(spotlessApply)

@@ -93,8 +93,8 @@ task vendordepJson() {
         from templateVendorFile
         into "$buildDir/repos/"
         expand(version: pubVersion,
-                groupId: artifactGroupId,
-                artifactId: baseArtifactId)
+        groupId: artifactGroupId,
+        artifactId: baseArtifactId)
     }
 }
 
@@ -149,8 +149,16 @@ model {
     publishing {
         repositories{
             maven{
-                name = "GitHubPackages"
+                name = "Repsy-Main"
                 url = uri("https://repo.repsy.io/mvn/advay/tunableconstants")
+                credentials {
+                    username = System.getenv("REPSY_USERNAME")
+                    password = System.getenv("REPSY_PASSWORD")
+                }
+            }
+            maven{
+                name = "Repsy-Dev"
+                url = uri("https://repo.repsy.io/mvn/advay/tunableconstants-dev")
                 credentials {
                     username = System.getenv("REPSY_USERNAME")
                     password = System.getenv("REPSY_PASSWORD")
