@@ -43,7 +43,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
     TUNABLE_TYPES.add("float");
     TUNABLE_TYPES.add("int");
     TUNABLE_TYPES.add("long");
-    TUNABLE_TYPES.add("java.lang.String");
+    TUNABLE_TYPES.add("String");
   }
 
   @Override
@@ -65,8 +65,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 
               MethodSpec.Builder constructorBuilder =
                   MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
-              constructorBuilder.addStatement(
-                  "$T TUNABLES = new $T()", TUNABLE_LIST_CLASS, TUNABLE_LIST_CLASS);
+              constructorBuilder.addStatement("TUNABLES = new $T()", TUNABLE_LIST_CLASS);
               MethodSpec.Builder reloadBuilder =
                   MethodSpec.methodBuilder("reload")
                       .addAnnotation(Override.class)
@@ -84,10 +83,9 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
                           if (finalIsSuperclass
                                   && fieldElement.getModifiers().contains(Modifier.PRIVATE)
                               || fieldElement.getModifiers().contains(Modifier.FINAL)) return;
-
                           String simpleName = fieldElement.getSimpleName().toString();
                           String fieldType = fieldElement.asType().toString();
-
+                          fieldType = fieldType.substring(fieldType.lastIndexOf('.') + 1);
                           if (TUNABLE_TYPES.contains(fieldType)) {
                             String preferencesName =
                                 fieldType.substring(0, 1).toUpperCase() + fieldType.substring(1);
@@ -117,38 +115,37 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
                           } else if ((elementUtil.getTypeElement(
                                       "com.roboloco.tune.tunable.Tunable" + fieldType)
                                   != null
-                              && typeUtil.isAssignable(
+                              && typeUtil.isSubtype(
                                   elementUtil
                                       .getTypeElement(
                                           "com.roboloco.tune.tunable.Tunable" + fieldType)
                                       .asType(),
-                                  elementUtil
-                                      .getTypeElement("com.roboloco.tune.tunable.Tunable")
-                                      .asType()))) {
+                                  typeUtil.erasure(
+                                      elementUtil
+                                          .getTypeElement("com.roboloco.tune.tunable.Tunable")
+                                          .asType())))) {
                             constructorBuilder.addStatement(
-                                "TUNABLES.add(new $T($S, $S))",
-                                ClassName.get(
-                                    "com.roboloco.tune.tunable",
-                                    "Tunable" + fieldType,
-                                    simpleName,
-                                    classElement.getSimpleName() + "/" + simpleName + "/"));
+                                "TUNABLES.add(new $T($L, $S))",
+                                ClassName.get("com.roboloco.tune.tunable", "Tunable" + fieldType),
+                                simpleName,
+                                classElement.getSimpleName() + "/" + simpleName + "/");
                           } else if ((elementUtil.getTypeElement(
                                       "frc.robot.util.tunable.Tunable" + fieldType)
                                   != null
-                              && typeUtil.isAssignable(
+                              && typeUtil.isSubtype(
                                   elementUtil
                                       .getTypeElement("frc.robot.util.tunable.Tunable" + fieldType)
                                       .asType(),
-                                  elementUtil
-                                      .getTypeElement("com.roboloco.tune.tunable.Tunable")
-                                      .asType()))) {
+                                  typeUtil.erasure(
+                                      elementUtil
+                                          .getTypeElement("com.roboloco.tune.tunable.Tunable")
+                                          .asType())))) {
                             constructorBuilder.addStatement(
-                                "TUNABLES.add(new $T($S, $S))",
+                                "TUNABLES.add(new $T($L, $S))",
                                 ClassName.get(
-                                    "frc.robot.util.tunable.tunable",
-                                    "Tunable" + fieldType,
-                                    simpleName,
-                                    classElement.getSimpleName() + "/" + simpleName + "/"));
+                                    "frc.robot.util.tunable.tunable", "Tunable" + fieldType),
+                                simpleName,
+                                classElement.getSimpleName() + "/" + simpleName + "/");
                           } else {
                             return;
                           }
@@ -165,7 +162,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
                       .addModifiers(Modifier.PUBLIC)
                       .addAnnotation(
                           AnnotationSpec.builder(SuppressWarnings.class)
-                              .addMember("value", "\"unchecked\"")
+                              .addMember("value", "\"rawtypes\"")
                               .build())
                       .addField(TUNABLE_LIST_CLASS, "TUNABLES", Modifier.PRIVATE)
                       .addSuperinterface(TUNABLE_CONSTANT_TYPE)
