@@ -15,7 +15,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import com.roboloco.tune.TunableConstants;
 
+/**
+ * Annotation to mark a class as a Constants class that will have a
+ * {@link TunableConstants} generated for it.
+ *
+ * @implSpec Ensure that any fields you would like to be tunable are public and
+ *           static, and ensure this class is not final.
+ *
+ * @author Kavin Muralikrishnan
+ */
+@SuppressWarnings("unused")
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface IsTunableConstants {

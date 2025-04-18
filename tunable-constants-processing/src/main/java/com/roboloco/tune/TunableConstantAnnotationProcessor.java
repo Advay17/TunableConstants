@@ -2,7 +2,6 @@ package com.roboloco.tune;
 
 import com.squareup.javapoet.*;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -19,11 +18,12 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 public class TunableConstantAnnotationProcessor extends AbstractProcessor {
-
 	private static final TypeName TUNABLE_CONSTANT_TYPE = ClassName.get("com.roboloco.tune", "TunableConstants");
 	private static final ClassName PREFERENCES_CLASS = ClassName.get("edu.wpi.first.wpilibj", "Preferences");
 	private static final TypeName TUNABLE_LIST_CLASS = ParameterizedTypeName.get(ClassName.get(LinkedList.class),
 			ClassName.get("com.roboloco.tune.tunable", "Tunable"));
+	private static final TypeName IMMUTABLE_LIST_CLASS = ParameterizedTypeName.get(ClassName.get(LinkedList.class),
+			ClassName.get("com.roboloco.tune.tunable", "ImmutableTunable"));
 	private static final HashSet<String> BASE_TUNABLE_TYPES = new HashSet<String>() {
 		{
 			add("boolean");
@@ -37,7 +37,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 	private static final LinkedList<String> TUNABLE_PACKAGES = new LinkedList<>() {
 		{
 			add("frc.robot.util.tunable");
-			add("com.roboloco.tune.tunable");
+			add("com.roboloco.tune.tunable.tunables");
 		}
 	};
 
@@ -55,14 +55,19 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 
 			MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
 			constructorBuilder.addStatement("TUNABLES = new $T()", TUNABLE_LIST_CLASS);
+			constructorBuilder.addStatement("IMMUTABLE_TUNABLES = new $T()", IMMUTABLE_LIST_CLASS);
 			MethodSpec.Builder reloadBuilder = MethodSpec.methodBuilder("reload").addAnnotation(Override.class)
 					.addModifiers(Modifier.PUBLIC);
 			Types typeUtil = processingEnv.getTypeUtils();
 			Elements elementUtil = processingEnv.getElementUtils();
 			TypeMirror tunableTypeMirror = typeUtil
 					.erasure(elementUtil.getTypeElement("com.roboloco.tune.tunable.Tunable").asType());
+			TypeMirror immutableTunableTypeMirror = typeUtil
+					.erasure(elementUtil.getTypeElement("com.roboloco.tune.tunable.ImmutableTunable").asType());
 			TypeElement typeElement = (TypeElement) classElement;
 			boolean isSuperClass = false;
+			reloadBuilder.addStatement("TUNABLES.forEach(Tunable::reload)");
+			LinkedList<Element> immutableTunables = new LinkedList<>();
 			while (typeElement != null) {
 				final boolean finalIsSuperclass = isSuperClass;
 				typeElement.getEnclosedElements().stream().filter(f -> f.getKind().equals(ElementKind.FIELD))
@@ -93,9 +98,22 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 																		.directSupertypes(tunable.asType()).get(0)))
 																				.getTypeArguments().get(0),
 																fieldElement.asType())) {
-													constructorBuilder.addStatement("TUNABLES.add(new $T($L, $S))",
-															ClassName.get(tunable.asType()), simpleName,
-															classElement.getSimpleName() + "/" + simpleName + "/");
+													if (typeUtil.isSubtype(tunable.asType(),
+															immutableTunableTypeMirror)) {
+														constructorBuilder.addStatement(
+																"$T tunable_$L = new $T($L, $S)",
+																ClassName.get(tunable.asType()), simpleName,
+																ClassName.get(tunable.asType()), simpleName,
+																classElement.getSimpleName() + "/" + simpleName + "/");
+														constructorBuilder.addStatement("TUNABLES.add(tunable_$L)",
+																simpleName);
+														constructorBuilder.addStatement(
+																"IMMUTABLE_TUNABLES.add(tunable_$L)", simpleName);
+														immutableTunables.add(fieldElement);
+													} else
+														constructorBuilder.addStatement("TUNABLES.add(new $T($L, $S))",
+																ClassName.get(tunable.asType()), simpleName,
+																classElement.getSimpleName() + "/" + simpleName + "/");
 													return;
 												}
 											});
@@ -108,13 +126,17 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 				} else
 					typeElement = null;
 			}
-			reloadBuilder.addStatement("TUNABLES.forEach(Tunable::reload)");
+			for (int i = 0; i < immutableTunables.size(); i++) { // TODO: make this less hacky
+				reloadBuilder.addStatement("$L = ($T) (IMMUTABLE_TUNABLES.get($L)).getTarget()",
+						immutableTunables.get(i).getSimpleName(), ClassName.get(immutableTunables.get(i).asType()), i);
+			}
 			TypeSpec type = TypeSpec.classBuilder(tunableConstantsClassName).addModifiers(Modifier.PUBLIC)
 					.addAnnotation(
 							AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"rawtypes\"").build())
-					.addField(TUNABLE_LIST_CLASS, "TUNABLES", Modifier.PRIVATE).addSuperinterface(TUNABLE_CONSTANT_TYPE)
-					.superclass(classElement.asType()).addMethod(constructorBuilder.build())
-					.addMethod(reloadBuilder.build()).build();
+					.addField(TUNABLE_LIST_CLASS, "TUNABLES", Modifier.PRIVATE)
+					.addField(IMMUTABLE_LIST_CLASS, "IMMUTABLE_TUNABLES", Modifier.PRIVATE)
+					.addSuperinterface(TUNABLE_CONSTANT_TYPE).superclass(classElement.asType())
+					.addMethod(constructorBuilder.build()).addMethod(reloadBuilder.build()).build();
 			JavaFile file = JavaFile.builder(tuanbleConstantsPackage, type).build();
 			try {
 				file.writeTo(processingEnv.getFiler());

@@ -75,6 +75,7 @@ tasks.withType(JavaCompile) {
 // Setup Javadocs to link back to WPILib docs
 javadoc {
     options {
+        addStringOption('tag', 'implSpec:a:Implementation Requirements:')
         links "https://docs.oracle.com/en/java/javase/$javaVersion/docs/api/", 'https://github.wpilib.org/allwpilib/docs/release/java/'
     }
 }
