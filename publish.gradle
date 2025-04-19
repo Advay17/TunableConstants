@@ -7,7 +7,7 @@ ext.licenseFile = files("$rootDir/LICENSE.txt")
 
 def templateVendorFile = "TunableConstantsGenerator.json"
 
-def pubVersion = '0.0.4'
+def pubVersion = '0.0.5'
 
 def outputsFolder = file("$buildDir/outputs")
 

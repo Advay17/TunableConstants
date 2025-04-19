@@ -37,7 +37,7 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 	private static final LinkedList<String> TUNABLE_PACKAGES = new LinkedList<>() {
 		{
 			add("frc.robot.util.tunable");
-			add("com.roboloco.tune.tunable.tunables");
+			add("com.roboloco.tune.tunable");
 		}
 	};
 
@@ -133,6 +133,8 @@ public class TunableConstantAnnotationProcessor extends AbstractProcessor {
 			TypeSpec type = TypeSpec.classBuilder(tunableConstantsClassName).addModifiers(Modifier.PUBLIC)
 					.addAnnotation(
 							AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"rawtypes\"").build())
+					.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+							.addMember("value", "\"unused\"").build())
 					.addField(TUNABLE_LIST_CLASS, "TUNABLES", Modifier.PRIVATE)
 					.addField(IMMUTABLE_LIST_CLASS, "IMMUTABLE_TUNABLES", Modifier.PRIVATE)
 					.addSuperinterface(TUNABLE_CONSTANT_TYPE).superclass(classElement.asType())
