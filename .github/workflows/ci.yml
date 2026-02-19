@@ -92,7 +92,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Combine
-        if: ${{ github.event_name == 'release' }}
+        # if: ${{ github.event_name == 'release' }}
         run: ./gradlew publish -Pthirdparty
         env:
           REPSY_USERNAME: ${{ secrets.USERNAME }}
